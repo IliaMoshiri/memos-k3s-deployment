@@ -58,7 +58,7 @@ Ensure all Pods, Services, and Ingress resources are healthy:
 
 ## 🔒 Security Best Practices
 
-* **Zero Hardcoded Secrets:**Sensitive strings (both database password and full connection DSNs) are decoupling-managed via Kubernetes `Secret` resources using `secretKeyRef`.
+* **Zero Hardcoded Secrets:** Sensitive strings (both database password and full connection DSNs) are decoupling-managed via Kubernetes `Secret` resources using `secretKeyRef`.
 * **Credential Masking:** All secrets in source control are sanitized using standard placeholders (`<YOUR_DATABASE_PASSWORD>`) to prevent secret leakage.
 * **Resource Guardrails** Enforced CPU and Memory resource constraints (`requests` & `limits`) on container definitions prevent noisy neighbor issues.
 * **Least Privilege Scope:** Resources are strictly scoped to the `moshiri-app` namespace.
