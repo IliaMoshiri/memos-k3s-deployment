@@ -18,6 +18,13 @@ spec:
         image: postgres:17
         ports:
         - containerPort: 5432
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         env:
         - name: POSTGRES_DB
           valueFrom:

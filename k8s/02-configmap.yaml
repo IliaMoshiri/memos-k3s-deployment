@@ -5,4 +5,4 @@ metadata:
   namespace: moshiri-app
 data:
   POSTGRES_DB: "memos_db"
-  POSTGRES_USER: "your_db_user!"
+  POSTGRES_USER: "memos_user"

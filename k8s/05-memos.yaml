@@ -15,14 +15,24 @@ spec:
     spec:
       containers:
       - name: memos
-        image: neosmemo/memos:latest
+        image: ghcr.io/usememos/memos:latest
         ports:
         - containerPort: 5230
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
         env:
         - name: MEMOS_DRIVER
           value: "postgres"
         - name: MEMOS_DSN
-          value: "postgresql://your_db_user!:your_secure_pass!@postgres-service:5432/memos_db?sslmode=disable"
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: MEMOS_DSN
 ---
 apiVersion: v1
 kind: Service
