@@ -9,6 +9,7 @@ The application stack is deployed inside a dedicated Kubernetes Namespace (`mosh
 * **Namespace Isolation:** Multi-tenant separation using dedicated Kubernetes `Namespace`.
 * **Database Layer:** Stateful **PostgreSQL 17** deployment paired with a `ClusterIP` Service on port `5432`. Configuration and credentials are decoupled via `Secret` and `ConfigMap` objects.
 * **Application Layer:** **Memos** instance (`neosmemo/memos:latest`) connected to PostgreSQL using DSN environment variables via port `5230`.
+* **Resource Optimization:** Explicit CPU and Memory `requests` and `limits` configured across all workloads to ensure cluster stability and prevent resource starvation.
 * **Ingress Routing:** **Traefik Ingress Controller** managing external HTTP traffic for `moshiri.osdl.ir` down to the Memos service.
 
 ## 📁 Repository Structure
@@ -36,14 +37,20 @@ The application stack is deployed inside a dedicated Kubernetes Namespace (`mosh
 
 1. **Clone the repository:**
    ```bash
-   git clone git@github.com:YOUR_USERNAME/memos-k3s-deployment.git
+   git clone git@github.com:IliaMoshiri/memos-k3s-deployment.git
    cd memos-k3s-deployment
    ```
-2. **Apply manifests in sequence:**
+2. **Configure Secrets:**
+   Update `k8s/03-secret.yaml` with your actual database credentials or create the secret manually before deploying:
+   ```
+   POSTGRES_PASSWORD: "<YOUR_DATABASE_PASSWORD>"
+   MEMOS_DSN: "postgresql://memos_user:<YOUR_DATABASE_PASSWORD>@postgres-service:5432/memos_db?sslmode=disable"
+   ```
+3. **Apply manifests in sequence:**
    ```bash
    kubectl apply -f k8s/
    ```
-3. **Verify Cluster State:**
+4. **Verify Cluster State:**
 Ensure all Pods, Services, and Ingress resources are healthy:
    ```bash
    kubectl get all,ingress -n moshiri-app
@@ -51,9 +58,10 @@ Ensure all Pods, Services, and Ingress resources are healthy:
 
 ## 🔒 Security Best Practices
 
-* **Credential Masking:** Sensitive strings inside `k8s/02-configmap.yaml`, `k8s/03-secret.yaml`, and `k8s/05-memos.yaml` have been sanitized with dummy placeholders (`your_secure_pass!`, `your_db_user!`) prior to source control commit.
-* **Least Privilege:** Secrets are scoped strictly to the `moshiri-app` namespace to prevent cross-namespace unauthorized access.
-* **Environment Separation:** Database connection details are injected at runtime via Kubernetes primitives rather than hardcoded into container image layers.
+* **Zero Hardcoded Secrets:**Sensitive strings (both database password and full connection DSNs) are decoupling-managed via Kubernetes `Secret` resources using `secretKeyRef`.
+* **Credential Masking:** All secrets in source control are sanitized using standard placeholders (`<YOUR_DATABASE_PASSWORD>`) to prevent secret leakage.
+* **Resource Guardrails** Enforced CPU and Memory resource constraints (`requests` & `limits`) on container definitions prevent noisy neighbor issues.
+* **Least Privilege Scope:** Resources are strictly scoped to the `moshiri-app` namespace.
 
 ## 🛠️ Tech Stack
 
