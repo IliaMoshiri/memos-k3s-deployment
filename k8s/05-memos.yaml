@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memos-deployment
+  namespace: moshiri-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memos
+  template:
+    metadata:
+      labels:
+        app: memos
+    spec:
+      containers:
+      - name: memos
+        image: neosmemo/memos:latest
+        ports:
+        - containerPort: 5230
+        env:
+        - name: MEMOS_DRIVER
+          value: "postgres"
+        - name: MEMOS_DSN
+          value: "postgresql://your_db_user!:your_secure_pass!@postgres-service:5432/memos_db?sslmode=disable"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memos-service
+  namespace: moshiri-app
+spec:
+  selector:
+    app: memos
+  ports:
+  - port: 5230
+    targetPort: 5230
